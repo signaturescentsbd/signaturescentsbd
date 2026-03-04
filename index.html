@@ -3,94 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signature Scents BD | Home</title>
+    <title>Signature Scents BD | Luxury Collection</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
-        :root { --gold: #c5a059; --dark: #111; --white: #fff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-        body { background: var(--white); color: var(--dark); overflow-x: hidden; }
+        :root { --gold: #c5a059; --dark: #0a0a0a; --white: #ffffff; --gray: #f8f8f8; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Playfair Display', serif; }
+        body { background: var(--white); color: var(--dark); overflow-x: hidden; scroll-behavior: smooth; }
 
         /* Navigation */
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 8%; background: var(--white); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #eee; }
-        .logo { font-size: 18px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; color: var(--dark); text-decoration: none; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 8%; background: rgba(255,255,255,0.95); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #eee; backdrop-filter: blur(10px); }
+        .logo img { height: 50px; transition: 0.3s; } /* আপনার লোগো এখানে বসবে */
+        .logo-text { font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: var(--dark); }
+        
         .nav-links { display: flex; list-style: none; }
-        .nav-links li { margin-left: 30px; }
-        .nav-links a { text-decoration: none; color: var(--dark); font-size: 12px; text-transform: uppercase; font-weight: 600; transition: 0.3s; }
-        .nav-links a:hover { color: var(--gold); }
-        .hamburger { display: none; cursor: pointer; font-size: 24px; }
+        .nav-links li { margin-left: 35px; }
+        .nav-links a { text-decoration: none; color: var(--dark); font-size: 13px; text-transform: uppercase; font-weight: 600; transition: 0.3s; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 1.5px; bottom: -5px; left: 0; background: var(--gold); transition: 0.3s; }
+        .nav-links a:hover::after { width: 100%; }
 
-        /* Slider */
-        .hero { position: relative; height: 75vh; overflow: hidden; }
-        .slides { display: flex; width: 500%; height: 100%; animation: slide 20s infinite; }
-        .slides img { width: 20%; height: 100%; object-fit: cover; }
-        .hero-text { position: absolute; top: 50%; left: 8%; transform: translateY(-50%); z-index: 10; color: white; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-        .hero-text h1 { font-size: 55px; text-transform: uppercase; line-height: 1; margin-bottom: 20px; }
+        /* Hero Section with Parallax Effect */
+        .hero { position: relative; height: 90vh; display: flex; align-items: center; overflow: hidden; }
+        .hero-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .slides { display: flex; width: 500%; height: 100%; animation: slideAnim 25s infinite ease-in-out; }
+        .slides img { width: 20%; height: 100%; object-fit: cover; filter: brightness(0.7); }
 
-        @keyframes slide {
-            0%, 15% { margin-left: 0; }
-            20%, 35% { margin-left: -100%; }
-            40%, 55% { margin-left: -200%; }
-            60%, 75% { margin-left: -300%; }
-            80%, 100% { margin-left: -400%; }
+        .hero-content { padding: 0 8%; color: white; text-align: left; }
+        .hero-content h1 { font-size: clamp(40px, 8vw, 80px); line-height: 1.1; margin-bottom: 25px; text-transform: uppercase; }
+        .cta-btn { padding: 15px 45px; background: var(--gold); color: white; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; transition: 0.4s; border: 1px solid var(--gold); }
+        .cta-btn:hover { background: transparent; color: var(--gold); }
+
+        @keyframes slideAnim {
+            0%, 18% { transform: translateX(0); }
+            20%, 38% { transform: translateX(-20%); }
+            40%, 58% { transform: translateX(-40%); }
+            60%, 78% { transform: translateX(-60%); }
+            80%, 100% { transform: translateX(-80%); }
         }
 
-        /* Products */
-        .container { padding: 60px 8%; text-align: center; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-top: 40px; }
-        .card { text-decoration: none; color: var(--dark); transition: 0.3s; border: 1px solid transparent; padding: 15px; }
-        .card:hover { border-color: #eee; }
-        .card img { width: 100%; height: 320px; object-fit: contain; background: #f9f9f9; margin-bottom: 15px; }
-        .card h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .price { font-weight: bold; color: var(--gold); }
+        /* Animated Product Grid */
+        .section-title { text-align: center; margin: 80px 0 50px; }
+        .section-title h2 { font-size: 35px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 10px; }
+        .section-title .line { width: 60px; height: 3px; background: var(--gold); margin: 0 auto; }
 
+        .product-container { padding: 0 8% 100px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; }
+        .product-card { position: relative; text-decoration: none; color: var(--dark); overflow: hidden; transition: 0.5s; }
+        .img-box { position: relative; overflow: hidden; background: var(--gray); aspect-ratio: 1/1.2; display: flex; align-items: center; justify-content: center; }
+        .product-card img { width: 85%; height: auto; transition: 0.8s; }
+        .product-card:hover img { transform: scale(1.1); }
+        
+        .product-info { padding: 20px 0; text-align: center; }
+        .product-info h3 { font-size: 16px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+        .price { color: var(--gold); font-weight: bold; font-size: 18px; }
+
+        .hover-btn { position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 10px 30px; transition: 0.4s; font-size: 12px; }
+        .product-card:hover .hover-btn { bottom: 100px; }
+
+        /* Responsive Mobile Menu */
         @media (max-width: 768px) {
-            .nav-links { position: fixed; right: -100%; top: 65px; background: white; width: 100%; height: 100vh; flex-direction: column; align-items: center; padding-top: 50px; transition: 0.4s; }
+            nav { padding: 15px 5%; }
+            .nav-links { position: fixed; right: -100%; top: 70px; background: white; width: 100%; height: 100vh; flex-direction: column; align-items: center; padding-top: 50px; transition: 0.5s; }
             .nav-links.active { right: 0; }
-            .nav-links li { margin: 20px 0; }
-            .hamburger { display: block; }
-            .hero-text h1 { font-size: 35px; }
+            .nav-links li { margin: 25px 0; }
+            .hamburger { display: block; font-size: 28px; cursor: pointer; }
         }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="hamburger" onclick="toggle()"><i class="ri-menu-line"></i></div>
-        <a href="index.html" class="logo">Signature Scents <span>BD</span></a>
-        <ul class="nav-links" id="menu">
+        <div class="hamburger" onclick="toggleMenu()"><i class="ri-menu-line"></i></div>
+        <a href="index.html" class="logo">
+          <img src="Picsart_26-02-12_15-49-41-832.jpg" alt="Signature Scents BD" style="height: 50px; width: auto;">
+          </a>
+          <ul class="nav-links" id="menu">
             <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About</a></li>
+            <li><a href="about.html">Our Story</a></li>
             <li><a href="contact.html">Contact</a></li>
         </ul>
-        <div><i class="ri-search-line"></i></div>
+        <div class="nav-icons"><i class="ri-shopping-bag-line" style="font-size: 20px;"></i></div>
     </nav>
 
     <section class="hero">
-        <div class="hero-text">
-            <h1>Premium <br>Collections</h1>
+        <div class="hero-slider">
+            <div class="slides">
+                <img src="https://images.unsplash.com/photo-1541604193435-225878996233?w=1200" alt="S1">
+                <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=1200" alt="S2">
+                <img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=1200" alt="S3">
+                <img src="https://images.unsplash.com/photo-1557170334-a9632e77c6e4?w=1200" alt="S4">
+                <img src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=1200" alt="S5">
+            </div>
         </div>
-        <div class="slides">
-            <img src="https://images.unsplash.com/photo-1541604193435-225878996233?w=1200" alt="1">
-            <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=1200" alt="2">
-            <img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=1200" alt="3">
-            <img src="https://images.unsplash.com/photo-1557170334-a9632e77c6e4?w=1200" alt="4">
-            <img src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=1200" alt="5">
+        <div class="hero-content" data-aos="fade-up">
+            <p style="letter-spacing: 5px; text-transform: uppercase; margin-bottom: 10px;">The Art of Perfumery</p>
+            <h1>Defining <br>Your Essence</h1>
+            <a href="#shop" class="cta-btn">Explore More</a>
         </div>
     </section>
 
-    <div class="container">
-        <h2>SHOP ALL</h2>
-        <div class="product-grid">
-            <a href="product-details.html" class="card">
-                <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=500" alt="Eros">
-                <h3>Versace Eros Flame</h3>
-                <p class="price">৳450.00</p>
-            </a>
-            </div>
+    <div id="shop" class="section-title" data-aos="fade-up">
+        <h2>Our Collection</h2>
+        <div class="line"></div>
     </div>
 
+    <div class="product-container">
+        <a href="product-details.html" class="product-card" data-aos="fade-up">
+            <div class="img-box">
+                <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600" alt="Eros">
+                <div class="hover-btn">QUICK VIEW</div>
+            </div>
+            <div class="product-info">
+                <h3>Versace Eros Flame</h3>
+                <p class="price">৳450.00</p>
+            </div>
+        </a>
+
+        <a href="product-details.html" class="product-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="img-box">
+                <img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600" alt="Sauvage">
+                <div class="hover-btn">QUICK VIEW</div>
+            </div>
+            <div class="product-info">
+                <h3>Dior Sauvage Elite</h3>
+                <p class="price">৳480.00</p>
+            </div>
+        </a>
+
+        <a href="product-details.html" class="product-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="img-box">
+                <img src="https://images.unsplash.com/photo-1557170334-a9632e77c6e4?w=600" alt="Blue Chanel">
+                <div class="hover-btn">QUICK VIEW</div>
+            </div>
+            <div class="product-info">
+                <h3>Bleu De Chanel</h3>
+                <p class="price">৳550.00</p>
+            </div>
+        </a>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        function toggle() { document.getElementById("menu").classList.toggle("active"); }
+        AOS.init({ duration: 1000, once: true });
+        function toggleMenu() { document.getElementById("menu").classList.toggle("active"); }
     </script>
 </body>
 </html>
