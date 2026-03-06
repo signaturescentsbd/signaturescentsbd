@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature Scents BD | The Elite Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        :root { 
+            --gold: #D4AF37; 
+            --gold-light: #F9E29C;
+            --black: #050505; 
+            --dark-grey: #0a0a0a;
+            --border: rgba(212, 175, 55, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+        body { background: var(--black); color: white; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
+
+        /* --- NAVIGATION --- */
+        .menu-trigger {
+            position: fixed; top: 30px; left: 30px; z-index: 2000;
+            width: 60px; height: 60px; background: rgba(0,0,0,0.8);
+            border: 1px solid var(--border); border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.5s; backdrop-filter: blur(10px);
+        }
+        .menu-trigger span { width: 25px; height: 2px; background: var(--gold); margin: 3px 0; transition: 0.4s; }
+        .menu-trigger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+        .menu-trigger.active span:nth-child(2) { opacity: 0; }
+        .menu-trigger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+
+        .sidebar {
+            position: fixed; top: 0; left: -100%; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
+            z-index: 1500; transition: 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar a {
+            font-family: 'Playfair Display'; font-size: clamp(2rem, 5vw, 3.5rem);
+            color: white; text-decoration: none; margin: 15px 0;
+            transition: 0.4s; letter-spacing: 5px; opacity: 0.6;
+        }
+        .sidebar a:hover { color: var(--gold); opacity: 1; transform: scale(1.1); }
+
+        /* --- HERO --- */
+        .hero { 
+            height: 100vh; width: 100%;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.95)), 
+                        url('https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1500'); 
+            background-size: cover; background-position: center;
+            display: flex; justify-content: center; align-items: center; text-align: center;
+        }
+        .hero h1 { font-family: 'Playfair Display'; font-size: clamp(3rem, 10vw, 6.5rem); color: var(--gold); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 12px; }
+
+        /* --- PRODUCT GRID --- */
+        .container { padding: 100px 8%; max-width: 1400px; margin: auto; }
+        .section-title { text-align: center; font-family: 'Playfair Display'; font-size: clamp(2.5rem, 5vw, 3.5rem); color: var(--gold); margin-bottom: 80px; letter-spacing: 5px; text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 60px; }
+        .card { background: var(--dark-grey); border: 1px solid #1a1a1a; padding: 35px; transition: 0.6s; text-align: center; cursor: pointer; position: relative; }
+        .card:hover { border-color: var(--gold); transform: translateY(-15px); }
+        .card img { width: 100%; height: 450px; object-fit: cover; margin-bottom: 30px; }
+        .price { color: var(--gold); font-size: 1.5rem; margin-bottom: 30px; display: block; font-weight: bold; }
+
+        /* --- PREMIUM TRACK ORDER --- */
+        .track-section { padding: 100px 8%; text-align: center; background: #080808; border-top: 1px solid #111; }
+        .track-card {
+            max-width: 600px; margin: 0 auto; background: var(--dark-grey);
+            padding: 50px; border: 1px solid #1a1a1a; transition: 0.4s;
+        }
+        .track-input {
+            width: 100%; padding: 20px; background: #000; border: 1px solid #222;
+            color: white; font-family: 'Poppins'; text-align: center; font-size: 1.1rem;
+            margin-bottom: 30px; outline: none;
+        }
+        #trackResult { margin-top: 30px; font-weight: 600; color: var(--gold); min-height: 24px; }
+
+        /* --- FLOATING CHAT BUTTON --- */
+        .chat-container { position: fixed; bottom: 30px; right: 30px; z-index: 3000; }
+        .chat-trigger {
+            width: 60px; height: 60px; background: var(--gold); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; color: black; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+            transition: 0.5s;
+        }
+        .chat-options {
+            position: absolute; bottom: 80px; right: 0; display: flex; flex-direction: column;
+            gap: 15px; visibility: hidden; opacity: 0; transform: translateY(20px); transition: 0.4s;
+        }
+        .chat-container.active .chat-options { visibility: visible; opacity: 1; transform: translateY(0); }
+        .chat-option {
+            width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem; text-decoration: none; transition: 0.3s;
+        }
+        .whatsapp { background: #25D366; }
+        .messenger { background: #0084FF; }
+
+        /* --- MODALS & FORMS --- */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; z-index: 5000; padding: 20px; overflow-y: auto; }
+        .modal-content { max-width: 550px; margin: 40px auto; background: #000; padding: 45px; border: 1px solid var(--gold); position: relative; text-align: center; }
+        .close { position: absolute; top: 20px; right: 25px; font-size: 2.5rem; color: var(--gold); cursor: pointer; }
+        .btn { padding: 18px 45px; background: var(--gold); color: black; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.4s; letter-spacing: 2px; }
+        .form-group { position: relative; margin-bottom: 20px; text-align: left; }
+        .form-group i { position: absolute; left: 15px; top: 18px; color: var(--gold); }
+        input, textarea, select { width: 100%; padding: 18px 18px 18px 45px; background: #080808; border: 1px solid #222; color: white; outline: none; }
+
+        /* --- SUCCESS POPUP --- */
+        #successModal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            background: #000; border: 2px solid var(--gold); padding: 50px;
+            z-index: 9999; display: none; text-align: center; opacity: 0;
+            transition: 0.5s; box-shadow: 0 0 50px rgba(212, 175, 55, 0.3);
+        }
+        #successModal.active { transform: translate(-50%, -50%) scale(1); opacity: 1; display: block; }
+
+        .footer { background: #080808; padding: 80px 8% 40px; border-top: 1px solid #111; text-align: center; color: #666; }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-options">
+            <a href="https://wa.me/8801410610013" class="chat-option whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://m.me/SignatureScentsBD" class="chat-option messenger" target="_blank"><i class="fab fa-facebook-messenger"></i></a>
+        </div>
+        <div class="chat-trigger" onclick="document.getElementById('chatContainer').classList.toggle('active')">
+            <i class="fas fa-comment-dots"></i>
+        </div>
+    </div>
+
+    <div class="menu-trigger" onclick="toggleSidebar()" id="trigger">
+        <span></span><span></span><span></span>
+    </div>
+
+    <nav class="sidebar" id="sidebar">
+        <a href="#" onclick="toggleSidebar()">HOME</a>
+        <a href="#shop" onclick="toggleSidebar()">COLLECTION</a>
+        <a href="#track" onclick="toggleSidebar()">TRACK ORDER</a>
+        <a href="#footer" onclick="toggleSidebar()">CONTACT</a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1 data-aos="fade-down">Signature Scents</h1>
+            <p style="letter-spacing: 10px; color: #888;">Elegance In Every Drop</p>
+            <br><br>
+            <a href="#shop" class="btn">Shop Collection</a>
+        </div>
+    </section>
+
+    <div id="shop" class="container">
+        <h2 class="section-title" data-aos="fade-up">Elite Collection</h2>
+        <div class="grid" id="productGrid"></div>
+    </div>
+
+    <section id="track" class="track-section">
+        <h2 class="section-title" data-aos="fade-up">Track Your Order</h2>
+        <div class="track-card" data-aos="zoom-in">
+            <p style="color: #666; margin-bottom: 25px; font-size: 0.9rem; letter-spacing: 1px;">Enter Phone or Order ID to status</p>
+            <input type="text" id="trackID" class="track-input" placeholder="SS-XXXX or 01XXX...">
+            <button class="btn" style="width: 100%;" onclick="trackOrder()">Track Now</button>
+            <div id="trackResult"></div>
+        </div>
+    </section>
+
+    <div id="detailsOverlay" class="overlay">
+        <div class="modal-content">
+            <span class="close" onclick="closeDetails()">&times;</span>
+            <img id="detImg" style="width:100%; height:300px; object-fit:cover; margin-bottom:25px;">
+            <h2 id="detName" style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:10px;"></h2>
+            <p id="detDesc" style="color:#aaa; font-size:0.9rem; margin-bottom:25px;"></p>
+            <button class="btn" style="width: 100%;" onclick="proceedToCheckout()">Order Now</button>
+        </div>
+    </div>
+
+    <div id="orderOverlay" class="overlay">
+        <div class="modal-content">
+            <span class="close" onclick="closeOrder()">&times;</span>
+            <h2 style="color:var(--gold); margin-bottom:30px; letter-spacing:3px; font-family:'Playfair Display';">CHECKOUT</h2>
+            <form id="checkoutForm">
+                <div class="form-group"><i class="fas fa-user"></i><input type="text" id="custName" placeholder="Full Name" required></div>
+                <div class="form-group"><i class="fas fa-phone"></i><input type="tel" id="custPhone" placeholder="Mobile Number" required></div>
+                <div class="form-group"><i class="fas fa-map-marker-alt"></i><textarea id="custAddress" placeholder="Delivery Address" rows="3" style="padding-left:45px;" required></textarea></div>
+                <div class="form-group"><i class="fas fa-truck"></i>
+                    <select id="deliveryArea" onchange="updateTotal()">
+                        <option value="60">Inside Dhaka (৳60)</option>
+                        <option value="120">Outside Dhaka (৳120)</option>
+                    </select>
+                </div>
+                <div class="form-group"><i class="fas fa-credit-card"></i>
+                    <select id="payMethod" onchange="togglePayInfo()">
+                        <option value="Cash on Delivery">Cash on Delivery</option>
+                        <option value="bKash/Nagad">bKash/Nagad (Personal)</option>
+                    </select>
+                </div>
+                <div id="paymentInfoBox" style="display:none; margin-top:15px;">
+                    <p style="color:var(--gold); font-size:0.8rem; margin-bottom:10px;">Pay to: 01410610013</p>
+                    <div class="form-group"><i class="fas fa-receipt"></i><input type="text" id="transID" placeholder="Transaction ID"></div>
+                </div>
+                <div class="checkout-summary">
+                    <h3 style="color:var(--gold); font-size:2.2rem;">৳ <span id="gTotal">0</span></h3>
+                </div>
+                <button type="button" class="btn" style="width:100%;" onclick="sendOrder()">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="successModal">
+        <div style="font-size: 5rem; color: var(--gold); margin-bottom: 20px;"><i class="fas fa-check-circle"></i></div>
+        <h2 style="font-family:'Playfair Display'; color:var(--gold);">Order Placed!</h2>
+        <p style="color: #fff; margin: 15px 0;">Order ID: <span id="displayOrderID" style="color: var(--gold); font-weight: bold;"></span></p>
+        <button class="btn" style="padding: 10px 20px; font-size: 0.7rem;" onclick="copyOrderID()">Copy ID</button>
+        <br><br>
+        <button class="btn" onclick="closeSuccess()">Wonderful</button>
+    </div>
+
+    <footer class="footer" id="footer">
+        <div style="font-family:'Playfair Display'; font-size:1.8rem; color:var(--gold); letter-spacing: 3px;">SIGNATURE SCENTS BD</div>
+        <p>&copy; 2026 SIGNATURE SCENTS BD</p>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1200, once: true });
+        
+        const BOT_TOKEN = '8187614545:AAHdx3jvGdZoPSyLWB26pBgS1-XTM6ZoOAs';
+        const CHAT_ID = '7233519894';
+
+        const products = [
+            { id: 'vampire-blood', name: 'Vampire Blood', price: 450, image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800', desc: 'একটি রহস্যময় এবং সাহসী ঘ্রাণ।' },
+            { id: 'creed-aventus', name: 'Creed Aventus', price: 1200, image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=800', desc: 'সাফল্য এবং ক্ষমতার প্রতীক।' },
+            { id: 'sauvage-dior', name: 'Sauvage Dior', price: 950, image: 'https://images.unsplash.com/photo-1557170334-a7c3a4e248d8?q=80&w=800', desc: 'একদম ফ্রেশ এবং র।' }
+        ];
+
+        let currentItem = null;
+
+        function render() {
+            document.getElementById('productGrid').innerHTML = products.map((p) => `
+                <div class="card" data-aos="fade-up" onclick="openDetails('${p.id}')">
+                    <img src="${p.image}">
+                    <h3>${p.name}</h3>
+                    <span class="price">৳ ${p.price}</span>
+                    <button class="btn" style="padding:10px 25px; font-size:0.7rem;">Explore</button>
+                </div>
+            `).join('');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('trigger').classList.toggle('active');
+        }
+
+        function openDetails(id) {
+            currentItem = products.find(p => p.id === id);
+            document.getElementById('detImg').src = currentItem.image;
+            document.getElementById('detName').innerText = currentItem.name;
+            document.getElementById('detDesc').innerText = currentItem.desc;
+            document.getElementById('detailsOverlay').style.display = 'block';
+        }
+
+        function closeDetails() { document.getElementById('detailsOverlay').style.display = 'none'; }
+        function proceedToCheckout() { closeDetails(); document.getElementById('orderOverlay').style.display = 'block'; updateTotal(); }
+        function closeOrder() { document.getElementById('orderOverlay').style.display = 'none'; }
+        function updateTotal() { const charge = parseInt(document.getElementById('deliveryArea').value); document.getElementById('gTotal').innerText = currentItem.price + charge; }
+        function togglePayInfo() { const method = document.getElementById('payMethod').value; document.getElementById('paymentInfoBox').style.display = (method === 'bKash/Nagad') ? 'block' : 'none'; }
+
+        function sendOrder() {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const addr = document.getElementById('custAddress').value.trim();
+            const pay = document.getElementById('payMethod').value;
+            const tid = document.getElementById('transID').value.trim() || "N/A";
+            const total = document.getElementById('gTotal').innerText;
+
+            if(!name || !phone || !addr) return alert("Fill details!");
+
+            const orderID = "SS-" + Math.floor(1000 + Math.random() * 9000);
+            const text = `⚜️ *ORDER: ${orderID}*%0A👤 *Name:* ${name}%0A📞 *Phone:* ${phone}%0A📍 *Addr:* ${addr}%0A📦 *Product:* ${currentItem.name}%0A💰 *Total:* ${total}%0A💳 *Method:* ${pay}%0A🔑 *TrxID:* ${tid}`;
+            
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}&parse_mode=Markdown`)
+            .then(() => {
+                closeOrder();
+                document.getElementById('displayOrderID').innerText = orderID;
+                const sm = document.getElementById('successModal');
+                sm.style.display = 'block';
+                setTimeout(() => sm.classList.add('active'), 10);
+            });
+        }
+
+        function trackOrder() {
+            const val = document.getElementById('trackID').value.trim();
+            const res = document.getElementById('trackResult');
+            if(!val) return alert("Enter something!");
+            res.innerText = "🔍 Searching...";
+            setTimeout(() => { res.innerHTML = "<i class='fas fa-box'></i> STATUS: Your order is confirmed and being prepared!"; }, 1200);
+        }
+
+        function copyOrderID() {
+            const id = document.getElementById('displayOrderID').innerText;
+            navigator.clipboard.writeText(id).then(() => alert("ID Copied: " + id));
+        }
+
+        function closeSuccess() {
+            document.getElementById('successModal').classList.remove('active');
+            setTimeout(() => document.getElementById('successModal').style.display = 'none', 500);
+        }
+
+        render();
+    </script>
+</body>
+</html>
