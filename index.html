@@ -77,18 +77,18 @@
         .status-badge { background: var(--gold); color: black; padding: 4px 12px; font-size: 0.75rem; font-weight: bold; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- FOOTER (Updated for centering) --- */
+        /* --- FOOTER --- */
         .luxury-footer { width: 100%; background: #000; padding: 80px 5% 30px; border-top: 1px solid var(--border); margin-top: 50px; }
         .footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; }
-        .footer-logo { display: flex; flex-direction: column; align-items: center; text-align: center; } /* Centering content */
+        .footer-logo { display: flex; flex-direction: column; align-items: center; text-align: center; }
         .footer-logo h2 { font-family: 'Playfair Display'; color: var(--gold); font-size: 1.8rem; margin-bottom: 20px; }
         .footer-logo p { color: #666; font-size: 0.9rem; line-height: 1.6; max-width: 350px; margin-bottom: 25px; }
-        .footer-socials { display: flex; gap: 25px; justify-content: center; } /* Centering icons */
+        .footer-socials { display: flex; gap: 25px; justify-content: center; }
         .footer-socials a { color: var(--gold); font-size: 1.5rem; transition: 0.4s; }
         .footer-socials a:hover { transform: translateY(-5px); color: white; }
         
         .footer-head { color: white; text-transform: uppercase; letter-spacing: 2px; font-size: 1rem; margin-bottom: 25px; display: block; }
-        .footer-links { text-align: center; } /* Centering links on mobile */
+        .footer-links { text-align: center; }
         .footer-links a { display: block; color: #888; text-decoration: none; margin-bottom: 12px; transition: 0.3s; font-size: 0.9rem; }
         .footer-links a:hover { color: var(--gold); transform: translateX(5px); }
         .footer-bottom { text-align: center; border-top: 1px solid #111; margin-top: 60px; padding-top: 25px; color: #333; font-size: 0.75rem; letter-spacing: 2px; }
@@ -110,7 +110,6 @@
             .about-luxury { grid-template-columns: 1fr; text-align: center; }
             .footer-container { grid-template-columns: 1fr; text-align: center; }
             .modal-content { flex-direction: column; width: 90%; }
-            .footer-logo { align-items: center; }
         }
         .view-det-btn {
             margin-top: 15px; padding: 10px 20px; background: transparent; border: 1px solid var(--gold);
@@ -172,7 +171,7 @@
             <button class="buy-now-btn" style="width:100%" onclick="trackOrder()">Track Now</button>
             
             <table class="tracking-table" id="trackingTable">
-                <tr><th>Status</th><td><span class="status-badge">Order Received</span></td></tr>
+                <tr><th>Status</th><td><span class="status-badge" id="tStatus">Checking...</span></td></tr>
                 <tr><th>Product</th><td id="tProduct">--</td></tr>
                 <tr><th>Payment</th><td id="tPayment">Cash on Delivery</td></tr>
                 <tr><th>Est. Delivery</th><td id="tDate">--</td></tr>
@@ -255,12 +254,16 @@
     <script>
         AOS.init({ duration: 1000, once: false });
 
+        // --- CONFIGURATION ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzD74eibpsRGLXLznvIRYnff7EFtxmDRzBOcEb7Agrem0aGTcVHgxLdm0D0Rz3jZC9gFA/exec";
+
         const products = [
             { id: 'v1', name: 'Vampire Blood', price: 450, desc: 'A mysterious blend of exotic berries.', img: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800' },
             { id: 's1', name: 'Sauvage Dior', price: 950, desc: 'The quintessential masculine fragrance.', img: 'https://images.unsplash.com/photo-1557170334-a7c3a4e248d8?q=80&w=800' }
         ];
 
-        let currentItem = null; let tempOrder = { id: "", prod: "" };
+        let currentItem = null; 
+        let tempOrder = { id: "", prod: "" };
 
         function showLoader(ms, cb) {
             document.getElementById('globalLoader').style.display = 'flex';
@@ -297,43 +300,89 @@
         function closeOrder() { document.getElementById('orderOverlay').style.display = 'none'; }
         function updateTotal() { document.getElementById('gTotal').innerText = currentItem.price + parseInt(document.getElementById('deliveryArea').value); }
 
-        function sendOrder() {
+        async function sendOrder() {
             const name = document.getElementById('custName').value;
-            if(!name) { alert("Please fill details"); return; }
-            showLoader(1500, () => {
-                const orderID = "SS-" + Math.floor(1000 + Math.random() * 9000);
-                tempOrder = { id: orderID, prod: currentItem.name };
-                document.getElementById('generatedID').innerText = orderID;
-                document.getElementById('orderOverlay').style.display = 'none';
-                document.getElementById('successOverlay').style.display = 'flex';
+            const phone = document.getElementById('custPhone').value;
+            const address = document.getElementById('custAddress').value;
+            
+            if(!name || !phone || !address) { alert("Please fill all details"); return; }
+            
+            const orderID = "SS-" + Math.floor(1000 + Math.random() * 9000);
+            const total = currentItem.price + parseInt(document.getElementById('deliveryArea').value);
+            
+            const orderData = {
+                action: "addOrder",
+                orderID: orderID,
+                name: name,
+                phone: phone,
+                address: address,
+                product: currentItem.name,
+                price: total
+            };
+
+            showLoader(2000, async () => {
+                try {
+                    await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        cache: 'no-cache',
+                        body: JSON.stringify(orderData)
+                    });
+
+                    tempOrder = { id: orderID, prod: currentItem.name };
+                    document.getElementById('generatedID').innerText = orderID;
+                    document.getElementById('orderOverlay').style.display = 'none';
+                    document.getElementById('successOverlay').style.display = 'flex';
+                } catch (e) {
+                    alert("Order failed. Please try again!");
+                }
             });
         }
 
         function finalizeOrder() {
-            const temp = document.createElement("input"); temp.value = tempOrder.id; document.body.appendChild(temp);
-            temp.select(); document.execCommand("copy"); document.body.removeChild(temp);
+            const temp = document.createElement("input"); 
+            temp.value = tempOrder.id; 
+            document.body.appendChild(temp);
+            temp.select(); 
+            document.execCommand("copy"); 
+            document.body.removeChild(temp);
+            
             alert("Tracking ID Copied: " + tempOrder.id);
-            document.getElementById('custName').value = ""; document.getElementById('custPhone').value = ""; document.getElementById('custAddress').value = "";
+            document.getElementById('custName').value = ""; 
+            document.getElementById('custPhone').value = ""; 
+            document.getElementById('custAddress').value = "";
             document.getElementById('successOverlay').style.display = 'none';
-            document.body.style.overflow = 'auto'; window.location.href = "#shop";
+            document.body.style.overflow = 'auto'; 
+            window.location.href = "#shop";
         }
 
-        function trackOrder() {
+        async function trackOrder() {
             const id = document.getElementById('trackInput').value;
             if(!id) return;
-            showLoader(1000, () => {
-                if(id === tempOrder.id) {
-                    document.getElementById('trackingTable').style.display = 'table';
-                    document.getElementById('tProduct').innerText = tempOrder.prod;
-                    const d = new Date(); d.setDate(d.getDate() + 3);
-                    document.getElementById('tDate').innerText = d.toLocaleDateString();
-                    document.getElementById('trackError').style.display = 'none';
-                } else {
-                    document.getElementById('trackingTable').style.display = 'none';
-                    document.getElementById('trackError').style.display = 'block';
+
+            showLoader(1000, async () => {
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: "getStatus", orderID: id })
+                    });
+                    const status = await response.text();
+                    
+                    if(status !== "Not Found") {
+                        document.getElementById('trackingTable').style.display = 'table';
+                        document.getElementById('tStatus').innerText = status;
+                        document.getElementById('tProduct').innerText = "Order: " + id;
+                        document.getElementById('trackError').style.display = 'none';
+                    } else {
+                        document.getElementById('trackingTable').style.display = 'none';
+                        document.getElementById('trackError').style.display = 'block';
+                    }
+                } catch (e) {
+                    alert("Tracking Error!");
                 }
             });
-         }
+        }
+
         render();
     </script>
 </body>
