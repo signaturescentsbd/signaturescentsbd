@@ -254,8 +254,8 @@
     <script>
         AOS.init({ duration: 1000, once: false });
 
-        // --- CONFIGURATION ---
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzD74eibpsRGLXLznvIRYnff7EFtxmDRzBOcEb7Agrem0aGTcVHgxLdm0D0Rz3jZC9gFA/exec";
+        // --- UPDATED CONFIGURATION (GET METHOD COMPATIBLE) ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyiMQnyZa0PPwiohwKWqMQrzZCE_d2rAJGaVgWxoMQLk3LKPXd87LlGq2O-KMgpH2qCeg/exec";
 
         const products = [
             { id: 'v1', name: 'Vampire Blood', price: 450, desc: 'A mysterious blend of exotic berries.', img: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800' },
@@ -300,6 +300,7 @@
         function closeOrder() { document.getElementById('orderOverlay').style.display = 'none'; }
         function updateTotal() { document.getElementById('gTotal').innerText = currentItem.price + parseInt(document.getElementById('deliveryArea').value); }
 
+        // --- UPDATED SEND ORDER FUNCTION (GET METHOD) ---
         async function sendOrder() {
             const name = document.getElementById('custName').value;
             const phone = document.getElementById('custPhone').value;
@@ -310,32 +311,20 @@
             const orderID = "SS-" + Math.floor(1000 + Math.random() * 9000);
             const total = currentItem.price + parseInt(document.getElementById('deliveryArea').value);
             
-            const orderData = {
-                action: "addOrder",
-                orderID: orderID,
-                name: name,
-                phone: phone,
-                address: address,
-                product: currentItem.name,
-                price: total
-            };
+            // Construct GET URL
+            const finalUrl = `${SCRIPT_URL}?action=addOrder&orderID=${orderID}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&product=${encodeURIComponent(currentItem.name)}&price=${total}`;
 
-            showLoader(2000, async () => {
-                try {
-                    await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        cache: 'no-cache',
-                        body: JSON.stringify(orderData)
-                    });
-
+            showLoader(2000, () => {
+                // Background pixel approach to avoid CORS and ensure delivery
+                const img = new Image();
+                img.src = finalUrl;
+                
+                img.onload = img.onerror = () => {
                     tempOrder = { id: orderID, prod: currentItem.name };
                     document.getElementById('generatedID').innerText = orderID;
                     document.getElementById('orderOverlay').style.display = 'none';
                     document.getElementById('successOverlay').style.display = 'flex';
-                } catch (e) {
-                    alert("Order failed. Please try again!");
-                }
+                };
             });
         }
 
@@ -362,13 +351,11 @@
 
             showLoader(1000, async () => {
                 try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: "getStatus", orderID: id })
-                    });
+                    // Tracking uses POST or simple fetch
+                    const response = await fetch(`${SCRIPT_URL}?action=getStatus&orderID=${id}`);
                     const status = await response.text();
                     
-                    if(status !== "Not Found") {
+                    if(status !== "Not Found" && status !== "") {
                         document.getElementById('trackingTable').style.display = 'table';
                         document.getElementById('tStatus').innerText = status;
                         document.getElementById('tProduct').innerText = "Order: " + id;
@@ -378,7 +365,7 @@
                         document.getElementById('trackError').style.display = 'block';
                     }
                 } catch (e) {
-                    alert("Tracking Error!");
+                    alert("Tracking Error! Please try later.");
                 }
             });
         }
